@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 /**
  * Classe de Usuário que extende Models
  */
-class User extends Model{
+class User extends Model {
   /**
    * Método de inicialização do Model User
    * @param Object - Objeto de conexão com banco de dados Sequelize
@@ -31,6 +31,10 @@ class User extends Model{
     });
 
     return this;
+  }
+
+  static associate(models) {
+    this.belongsTo(models.File, { foreignKey: 'avatar_id', as: 'avatar' });
   }
 
   checkPassword(password) {

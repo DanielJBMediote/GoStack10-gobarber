@@ -25,6 +25,6 @@ module.exports = {
     "class-method-use-this": "off",
     "no-param-reassgn": "off",
     "camelcase": "off",
-    "no-unsaved-vars": ["error", { "argsIgnorePattern": "next" }],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],
   }
 };
