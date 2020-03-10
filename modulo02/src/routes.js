@@ -11,6 +11,8 @@ import SessionController from './app/controllers/SessionController';
 import FileController from './app/controllers/FileController';
 import ProviderController from './app/controllers/ProviderController';
 import AppointmentController from './app/controllers/AppointmentController';
+import ScheduleController from './app/controllers/ScheduleController';
+import NotificationController from './app/controllers/NotificationController';
 
 //Importar middlewares
 import authMiddleware from './app/middlewares/auth';
@@ -27,6 +29,12 @@ routes.use(authMiddleware);
 
 // Rotas de Agendamento (Appointment)
 routes.post('/appointments', AppointmentController.store);
+routes.get('/appointments', AppointmentController.index);
+routes.delete('/appointments/:id', AppointmentController.delete);
+
+routes.get('/schedules', ScheduleController.index);
+routes.get('/notifications', NotificationController.index);
+routes.put('/notifications/:id', NotificationController.update);
 
 //Rotas de Usuario
 routes.put('/users', UserController.update);
