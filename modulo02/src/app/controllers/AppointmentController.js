@@ -1,12 +1,19 @@
-import Appointment from '../models/Appointment';
-import User from '../models/User';
-import File from '../models/File';
-import { isBefore, startOfHour, parseISO, format, subHours } from 'date-fns';
+import { format, isBefore, parseISO, startOfHour, subHours } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 import * as Yup from 'yup';
+import Queue from '../../lib/Queue';
+import CancelationMail from '../jobs/CancellationMail';
+import Appointment from '../models/Appointment';
+import File from '../models/File';
+import User from '../models/User';
 import Notification from '../schemas/Notification';
 
 class AppointmentController {
+  /**
+   * Método para listagem de Agendamento
+   * @param {*} request Object JSON
+   * @param {*} response Object JSON
+   */
   async index(request, response) {
     const { page = 1 } = request.query;
 
@@ -16,7 +23,7 @@ class AppointmentController {
         canceled_at: null,
       },
       order: ['date'],
-      attributes: ['id', 'date'],
+      attributes: ['id', 'date', 'past', 'cancelable'],
       limit: 20,
       offset: (page - 1) * 20,
       include: [
@@ -38,6 +45,11 @@ class AppointmentController {
     return response.json(appointments);
   }
 
+  /**
+   * Método para criação de Agendamento
+   * @param {*} request Object JSON
+   * @param {*} response Object JSON
+   */
   async store(request, response) {
     const schema = Yup.object().shape({
       provider_id: Yup.number().required(),
@@ -114,8 +126,26 @@ class AppointmentController {
     return response.json(appointment);
   }
 
+  /**
+   * Método para deletar um Agendamento
+   * @param {*} request Object JSON
+   * @param {*} response Object JSON
+   */
   async delete(request, response) {
-    const appointment = await Appointment.findByPk(request.params.id);
+    const appointment = await Appointment.findByPk(request.params.id, {
+      include: [
+        {
+          model: User,
+          as: 'provider',
+          attributes: ['name', 'email'],
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name'],
+        },
+      ],
+    });
 
     if (appointment.user_id !== request.userId) {
       return response.status(400).json({
@@ -131,10 +161,14 @@ class AppointmentController {
       });
     }
 
-    appointment.canceled_at = new date();
+    appointment.canceled_at = new Date();
     appointment.save();
 
-    return resposnse.json(appointment);
+    await Queue.add(CancelationMail.key, {
+      appointment,
+    });
+
+    return response.json(appointment);
   }
 }
 

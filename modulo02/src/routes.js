@@ -13,6 +13,7 @@ import ProviderController from './app/controllers/ProviderController';
 import AppointmentController from './app/controllers/AppointmentController';
 import ScheduleController from './app/controllers/ScheduleController';
 import NotificationController from './app/controllers/NotificationController';
+import AvaliableController from './app/controllers/AvaliableController';
 
 //Importar middlewares
 import authMiddleware from './app/middlewares/auth';
@@ -39,7 +40,7 @@ routes.put('/notifications/:id', NotificationController.update);
 //Rotas de Usuario
 routes.put('/users', UserController.update);
 routes.get('/providers', ProviderController.index);
-
+routes.get('/providers/:providerId/avaliable', AvaliableController.index)
 routes.post('/files', upload.single('file'), FileController.store);
 
 export default routes;

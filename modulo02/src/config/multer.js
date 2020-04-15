@@ -1,7 +1,7 @@
 // Importar as bibliotecas requisitadas
-import multer from 'multer';
 import crypto from 'crypto';
-import { resolve, extname } from 'path';
+import multer from 'multer';
+import { extname, resolve } from 'path';
 
 export default {
   storage: multer.diskStorage({
